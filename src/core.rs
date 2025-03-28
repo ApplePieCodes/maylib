@@ -48,7 +48,24 @@ impl Maylib {
     }
 
     pub fn should_close(&self) -> bool {
-        return self.windows.get(&self.current_window).unwrap().should_close;
+        match self.windows.get(&self.current_window) {
+            Some(w) => {
+                return w.should_close;
+            }
+            None => {
+                return true;
+            }
+        }
+    }
+
+    pub fn all_windows_closed(&self) -> bool {
+        let mut result = true;
+        for win in self.windows.iter() {
+            if win.1.ready == true {
+                result = false;
+            }
+        }
+        result
     }
 
     pub fn handle_events(&mut self) {
@@ -82,7 +99,7 @@ impl Maylib {
     }
 
     pub fn close_window(&mut self) {
-        let window = self.windows.remove(&self.current_window).unwrap();
+        let window = self.windows.remove(&self.current_window);
         drop(window);
     }
 

@@ -7,7 +7,8 @@ fn main() {
     let win = may.init_window("Hello Everynyan", 640, 480);
     let win2 = may.init_window("Hello Somenyan", 640, 480);
 
-    loop {
+    while !may.all_windows_closed() {
+        may.handle_events();
         may.switch_window(win);
         if may.should_close() {
             may.close_window();
