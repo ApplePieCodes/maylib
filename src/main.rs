@@ -1,33 +1,28 @@
 use core::{Color, Maylib};
 
-mod core;
-mod image;
+pub mod core;
+pub mod image;
+mod text;
 
 fn main() {
     let mut may = Maylib::new();
-    let win = may.init_window(640, 480, "Hello Everynyan");
-    let win2 = may.init_window(640, 480, "Hello Somenyan");
 
-    may.switch_window(win);
+    let mut window = may.init_window("Froggy", 1280, 720);
 
-    while !may.all_windows_closed() {
-        may.switch_window(win);
-        if may.window_should_close() {
-            may.close_window();
-        }
-        else {
-            may.begin_drawing();
-            may.clear_background(Color::new(255, 255, 255));
-            may.end_drawing();
-        }
-        may.switch_window(win2);
-        if may.window_should_close() {
-            may.close_window();
-        }
-        else {
-            may.begin_drawing();
-            may.clear_background(Color::new(255, 255, 255));
-            may.end_drawing();
-        }
+    may.load_font("C:\\Users\\Liam Greenway\\maylib\\font.ttf", "mayfont", 20);
+
+    may.switch_window(window);
+
+    while !may.window_should_close() {
+        may.begin_drawing();
+
+        may.clear_background(Color::MayGray);
+
+        may.draw_image("C:\\Users\\Liam Greenway\\maylib\\Frog-tree.jpg", 50, 50);
+        may.draw_text("mayfont", "Hello Freg", 100, 100, Color::White);
+
+        may.end_drawing()
     }
+
+    may.close_window();
 }

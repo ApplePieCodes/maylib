@@ -1,10 +1,13 @@
 use std::{collections::HashMap, str};
+use std::rc::Rc;
 use rand::{rng, Rng};
-use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, video, EventPump, TimerSubsystem, VideoSubsystem};
+use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, ttf, video, EventPump, TimerSubsystem, VideoSubsystem};
 use sdl2::clipboard::ClipboardUtil;
 use sdl2::image::{InitFlag, Sdl2ImageContext};
 use sdl2::keyboard::{KeyboardUtil, Scancode};
 use sdl2::mouse::{MouseButton, MouseUtil};
+use sdl2::render::{Texture, TextureCreator};
+use sdl2::ttf::{Font, Sdl2TtfContext};
 use sdl2::video::FullscreenType;
 
 pub struct Color {
@@ -13,6 +16,7 @@ pub struct Color {
     b: u8,
     a: u8
 }
+#[allow(non_upper_case_globals)]
 impl Color {
     pub fn new(r: u8, g: u8, b: u8) -> Color {
         return Color {
@@ -31,6 +35,132 @@ impl Color {
             a
         };
     }
+
+    pub const White: Color = Color {
+        r: 0xFF,
+        g: 0xFF,
+        b: 0xFF,
+        a: 0xFF
+    };
+
+    pub const RayWhite: Color = Color {
+        r: 0xF5,
+        g: 0xF5,
+        b: 0xF5,
+        a: 0xFF
+    };
+
+    pub const Silver: Color = Color {
+        r: 0xC0,
+        g: 0xC0,
+        b: 0xC0,
+        a: 0xFF
+    };
+
+    pub const Gray: Color = Color {
+        r: 0x80,
+        g: 0x80,
+        b: 0x80,
+        a: 0xFF
+    };
+
+    pub const MayGray: Color = Color {
+        r: 0x28,
+        g: 0x28,
+        b: 0x28,
+        a: 0xFF
+    };
+
+    pub const Black: Color = Color {
+        r: 0x00,
+        g: 0x00,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Red: Color = Color {
+        r: 0xFF,
+        g: 0x00,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Maroon: Color = Color {
+        r: 0x80,
+        g: 0x00,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Yellow: Color = Color {
+        r: 0xFF,
+        g: 0xFF,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Olive: Color = Color {
+        r: 0x80,
+        g: 0x80,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Lime: Color = Color {
+        r: 0x00,
+        g: 0xFF,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Green: Color = Color {
+        r: 0x00,
+        g: 0x80,
+        b: 0x00,
+        a: 0xFF
+    };
+
+    pub const Aqua: Color = Color {
+        r: 0x00,
+        g: 0xFF,
+        b: 0xFF,
+        a: 0xFF
+    };
+
+    pub const Teal: Color = Color {
+        r: 0x00,
+        g: 0x80,
+        b: 0x80,
+        a: 0xFF
+    };
+
+    pub const Blue: Color = Color {
+        r: 0x00,
+        g: 0x00,
+        b: 0xFF,
+        a: 0xFF
+    };
+
+    pub const Navy: Color = Color {
+        r: 0x00,
+        g: 0x00,
+        b: 0x80,
+        a: 0xFF
+    };
+
+    pub const Fuchsia: Color = Color {
+        r: 0xFF,
+        g: 0x00,
+        b: 0xFF,
+        a: 0xFF
+    };
+
+    pub const Purple: Color = Color {
+        r: 0x80,
+        g: 0x00,
+        b: 0x80,
+        a: 0xFF
+    };
 }
 impl From<Color> for pixels::Color {
     fn from(value: Color) -> Self {
@@ -45,7 +175,8 @@ impl From<Color> for pixels::Color {
 
 pub(crate) struct Window {
     pub(crate) window: video::Window,
-    canvas: Canvas<video::Window>,
+    pub(crate) canvas: Canvas<video::Window>,
+    pub(crate) texture: TextureCreator<video::WindowContext>,
     ready: bool,
     should_close: bool,
     fullscreen: bool,
@@ -66,10 +197,12 @@ pub struct Maylib {
     mouse: MouseUtil,
     timer: TimerSubsystem,
     pub(crate) image: Sdl2ImageContext,
+    pub(crate) ttf: Sdl2TtfContext,
     keyboard: KeyboardUtil,
     clipboard: ClipboardUtil,
     pub(crate) current_window: u32,
-    pub(crate) windows: HashMap<u32, Window>
+    pub(crate) windows: HashMap<u32, Window>,
+    pub(crate) fonts: HashMap<String, Rc<Font<'static, 'static>>>,
 }
 impl Maylib {
     pub fn new() -> Maylib {
@@ -79,21 +212,25 @@ impl Maylib {
             event_pump: sdl.event_pump().unwrap(),
             clipboard: video.clipboard(),
             mouse: sdl.mouse(),
+            ttf: ttf::init().unwrap(),
             timer: sdl.timer().unwrap(),
             keyboard: sdl.keyboard(),
             video,
             image: sdl2::image::init(InitFlag::PNG | InitFlag::JPG | InitFlag::TIF | InitFlag::WEBP).unwrap(),
             current_window: 4294967295, // There should never be a window with this value
-            windows: HashMap::new()
+            windows: HashMap::new(),
+            fonts: HashMap::new(),
         };
     }
 
-    pub fn init_window(&mut self, width: u32, height: u32, title: &str) -> u32 {
+    pub fn init_window(&mut self, title: &str, width: u32, height: u32) -> u32 {
         let winctx = self.video.window(title, width, height).position_centered().build().unwrap();
         let id = winctx.id();
         let start_time = self.timer.ticks64() as f64 / 1000f64;
+        let canvas = winctx.clone().into_canvas().build().unwrap();
         let window = Window {
-            canvas: winctx.clone().into_canvas().build().unwrap(),
+            texture: canvas.texture_creator(),
+            canvas,
             ready: false,
             should_close: false,
             fullscreen: false,
@@ -305,8 +442,10 @@ impl Maylib {
     }
 
     pub fn begin_drawing(&mut self) {
-        self.windows.get_mut(&self.current_window).unwrap().previous_time = self.windows.get(&self.current_window).unwrap().current_time;
-        self.windows.get_mut(&self.current_window).unwrap().previous_time = self.timer.ticks64() as f64 / 1000f64;
+        for window in self.windows.values_mut() {
+            window.previous_time = window.current_time;
+            window.previous_time = self.timer.ticks64() as f64 / 1000f64;
+        }
         for event in self.event_pump.poll_iter() {
             match event {
                 Event::Window { timestamp: _, window_id, win_event } => {
@@ -327,7 +466,9 @@ impl Maylib {
     }
 
     pub fn end_drawing(&mut self) {
-        self.windows.get_mut(&self.current_window).unwrap().canvas.present();
+        for window in self.windows.values_mut() {
+            window.canvas.present();
+        }
     }
 
     pub fn switch_window(&mut self, id: u32) {
