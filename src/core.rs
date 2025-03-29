@@ -1,14 +1,14 @@
-use std::{collections::HashMap, str};
-use std::rc::Rc;
 use rand::{rng, Rng};
-use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, ttf, video, EventPump, TimerSubsystem, VideoSubsystem};
 use sdl2::clipboard::ClipboardUtil;
 use sdl2::image::{InitFlag, Sdl2ImageContext};
 use sdl2::keyboard::{KeyboardUtil, Scancode};
 use sdl2::mouse::{MouseButton, MouseUtil};
-use sdl2::render::{Texture, TextureCreator};
+use sdl2::render::TextureCreator;
 use sdl2::ttf::{Font, Sdl2TtfContext};
 use sdl2::video::FullscreenType;
+use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, ttf, video, EventPump, TimerSubsystem, VideoSubsystem};
+use std::rc::Rc;
+use std::{collections::HashMap, str};
 
 pub struct Color {
     r: u8,
@@ -191,7 +191,7 @@ pub(crate) struct Window {
     start_time: f64,
 }
 
-pub struct Maylib {
+pub struct Maylib<'a> {
     video: VideoSubsystem,
     event_pump: EventPump,
     mouse: MouseUtil,
@@ -202,10 +202,10 @@ pub struct Maylib {
     clipboard: ClipboardUtil,
     pub(crate) current_window: u32,
     pub(crate) windows: HashMap<u32, Window>,
-    pub(crate) fonts: HashMap<String, Rc<Font<'static, 'static>>>,
+    pub(crate) fonts: HashMap<String, Box<Font<'a, 'a>>>,
 }
-impl Maylib {
-    pub fn new() -> Maylib {
+impl<'a> Maylib<'a> {
+    pub fn new() -> Maylib<'a> {
         let sdl = sdl2::init().unwrap();
         let video = sdl.video().unwrap();
         return Maylib {
