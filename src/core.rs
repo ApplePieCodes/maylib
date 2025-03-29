@@ -1,12 +1,10 @@
 use std::{collections::HashMap, str};
-use std::time::Duration;
 use rand::{rng, Rng};
-use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, video, EventPump, Sdl, TimerSubsystem, VideoSubsystem};
+use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, video, EventPump, TimerSubsystem, VideoSubsystem};
 use sdl2::clipboard::ClipboardUtil;
-use sdl2::image::{InitFlag, LoadSurface, Sdl2ImageContext};
+use sdl2::image::{InitFlag, Sdl2ImageContext};
 use sdl2::keyboard::{KeyboardUtil, Scancode};
-use sdl2::mouse::{Cursor, MouseButton, MouseUtil};
-use sdl2::timer::Timer;
+use sdl2::mouse::{MouseButton, MouseUtil};
 use sdl2::video::FullscreenType;
 
 pub struct Color {
@@ -311,7 +309,7 @@ impl Maylib {
         self.windows.get_mut(&self.current_window).unwrap().previous_time = self.timer.ticks64() as f64 / 1000f64;
         for event in self.event_pump.poll_iter() {
             match event {
-                Event::Window { timestamp, window_id, win_event } => {
+                Event::Window { timestamp: _, window_id, win_event } => {
                     match win_event {
                         WindowEvent::Close => {
                             self.windows.get_mut(&window_id).unwrap().should_close = true;

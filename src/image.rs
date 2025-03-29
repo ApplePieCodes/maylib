@@ -1,5 +1,4 @@
 use sdl2::image::LoadSurface;
-use sdl2::surface::Surface;
 use crate::core::Maylib;
 
 impl Maylib {
