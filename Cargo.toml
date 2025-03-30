@@ -1,6 +1,6 @@
 [package]
 name = "maylib"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Liam Greenway <liamgr33nway@gmail.com>"]
 edition = "2024"
 rust-version = "1.85.0"
@@ -14,10 +14,11 @@ categories = ["game-development", "graphics", "gui", "multimedia"]
 [dependencies]
 rand = "=0.9.0"
 open = "=5.3.2"
+rodio = "0.20.1"
 
 [dependencies.sdl2]
 version = "=0.37.0"
-features = ["image", "ttf", "gfx", "use-vcpkg", "static-link"]
+features = ["image", "ttf", "gfx", "mixer", "use-vcpkg", "static-link"]
 
 [lints.clippy]
 unwrap-used = "forbid"

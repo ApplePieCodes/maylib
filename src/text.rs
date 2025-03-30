@@ -19,6 +19,11 @@ impl FontManager {
         Font { font }
     }
 }
+impl Default for FontManager {
+    fn default() -> Self {
+        FontManager::new()
+    }
+}
 
 pub struct Font<'a> {
     pub(crate) font: sdl2::ttf::Font<'a, 'static>,

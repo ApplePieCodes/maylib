@@ -1,17 +1,12 @@
-use rand::{Rng, rng};
+use rand::{rng, Rng};
+use rodio::{OutputStream, OutputStreamHandle};
 use sdl2::clipboard::ClipboardUtil;
 use sdl2::image::InitFlag;
 use sdl2::keyboard::Scancode;
 use sdl2::mouse::{MouseButton, MouseUtil};
 use sdl2::render::TextureCreator;
 use sdl2::video::FullscreenType;
-use sdl2::{
-    EventPump, Sdl, TimerSubsystem, VideoSubsystem,
-    event::{Event, WindowEvent},
-    pixels,
-    render::Canvas,
-    video,
-};
+use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, video, EventPump, Sdl, TimerSubsystem, VideoSubsystem};
 use std::{collections::HashMap, str};
 
 #[derive(Clone, Copy)]
@@ -196,6 +191,8 @@ pub struct Maylib {
     pub(crate) windows: HashMap<u32, Window>,
     frame_rate: i32,
     frame_time: f32,
+    _audio_stream: OutputStream,
+    pub(crate) audio: OutputStreamHandle
 }
 impl Maylib {
     pub fn new() -> Result<Maylib, String> {
@@ -227,6 +224,14 @@ impl Maylib {
         };
         sdl2::image::init(InitFlag::PNG | InitFlag::JPG | InitFlag::TIF | InitFlag::WEBP)
             .expect("Image should init successfully");
+        let (_audio_stream, audio) = match OutputStream::try_default() {
+            Ok(s) => {
+                s
+            }
+            Err(e) => {
+                return Err(e.to_string().to_owned());
+            }
+        };
         Ok(Maylib {
             video,
             event_pump,
@@ -237,6 +242,8 @@ impl Maylib {
             windows: HashMap::new(),
             frame_rate: 60,
             frame_time: 1.0 / 60f32,
+            _audio_stream,
+            audio
         })
     }
 
@@ -629,7 +636,6 @@ impl Maylib {
     pub fn wait(&mut self, time: f64) {
         let start: f64 = self.get_time();
         let mut current: f64 = self.get_time();
-        println!("Waiting. Start at {current}. End at {start} + {time}");
 
         while current < start + time {
             self.windows
@@ -646,7 +652,6 @@ impl Maylib {
                 .current_time = self.timer.ticks64() as f64 / 1000f64;
             current = self.get_time();
         }
-        println!("Waiting. End at {}. Current time {}", current, current);
     }
 
     pub fn get_random_i64(min: i64, max: i64) -> i64 {
