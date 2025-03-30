@@ -7,7 +7,7 @@ rust-version = "1.85.0"
 description = "A rust-native raylib alternative with multiple window support"
 readme = "README.md"
 repository = "https://github.com/ApplePieCodes/maylib"
-license = "MPL-2"
+license = "MPL-2.0"
 keywords = ["display", "windowing", "graphics", "gui", "ui"]
 categories = ["game-development", "graphics", "gui", "multimedia"]
 
