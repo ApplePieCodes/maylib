@@ -6,6 +6,8 @@
 ![GitHub forks](https://img.shields.io/github/forks/ApplePieCodes/maylib)
 ![Crates.io Version](https://img.shields.io/crates/v/maylib)
 
+![Maylib Logo](maylib.png)
+
 I made multi-window raylib because I needed multiple windows in raylib.
 
 While Maylib is based on raylib, it is not a fork. I just used raylib as a reference
