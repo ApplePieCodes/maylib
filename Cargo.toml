@@ -1,7 +1,15 @@
 [package]
 name = "maylib"
 version = "0.1.0"
+authors = ["Liam Greenway <liamgr33nway@gmail.com>"]
 edition = "2024"
+rust-version = "1.85.0"
+description = "A rust-native raylib alternative with multiple window support"
+readme = "README.md"
+repository = "https://github.com/ApplePieCodes/maylib"
+license = "MPL-2"
+keywords = ["display", "windowing", "graphics", "gui", "ui"]
+categories = ["game-development", "graphics", "gui", "multimedia"]
 
 [dependencies]
 rand = "=0.9.0"
@@ -13,4 +21,3 @@ features = ["image", "ttf", "gfx", "use-vcpkg", "static-link"]
 
 [lints.clippy]
 unwrap-used = "forbid"
-todo = "forbid"
