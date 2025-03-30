@@ -4,6 +4,7 @@ use crate::text::FontManager;
 pub mod core;
 pub mod image;
 mod text;
+mod shapes;
 
 fn main() {
     let mut may = Maylib::new();
@@ -25,6 +26,7 @@ fn main() {
             let x = size.0 / 2 - tsize.0 / 2;
             let y = size.1 / 2 - tsize.1 / 2;
             may.draw_text(&font, "Hello Freg", x as i32, y as i32, Color::Red);
+            may.draw_circle(500, 500, 500, Color::Green);
 
             may.end_drawing()
         }

@@ -10,6 +10,7 @@ use std::rc::Rc;
 use std::{collections::HashMap, str};
 use crate::text;
 
+#[derive(Clone, Copy)]
 pub struct Color {
     r: u8,
     g: u8,
@@ -19,12 +20,12 @@ pub struct Color {
 #[allow(non_upper_case_globals)]
 impl Color {
     pub fn new(r: u8, g: u8, b: u8) -> Color {
-        return Color {
+        Color {
             r,
             g,
             b,
             a: 255
-        };
+        }
     }
 
     pub fn new_alpha(r: u8, g: u8, b: u8, a: u8) -> Color {
