@@ -10,7 +10,7 @@ pub mod test {
 
     #[test]
     pub fn audio_test() {
-        let mut maylib = Maylib::new().expect("Code in tests should be correct");
+        let mut maylib = Maylib::init().expect("Code in tests should be correct");
         let window = maylib.init_window("", 500, 500).expect("Code in tests should be correct");
         maylib.switch_window(window);
         maylib.play_sound("./baldi_testaudio.wav");

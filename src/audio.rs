@@ -4,11 +4,13 @@ use std::fs::File;
 use std::io::BufReader;
 
 impl Maylib {
+    /// Plays the audio file at path
     pub fn play_sound(&mut self, path: &str) {
+        // Load the audio
         let file = BufReader::new(File::open(path).expect("File not found"));
-        // Decode that sound file into a source
+        // Decode
         let source = Decoder::new(file).expect("File not valid");
-        // Play the sound directly on the device
+        // And play. It's that shrimple
         self.audio.play_raw(source.convert_samples()).expect("TODO: panic message");
     }
 }

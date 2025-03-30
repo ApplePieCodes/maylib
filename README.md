@@ -13,8 +13,10 @@ While Maylib is based on raylib, it is not a fork. I just used raylib as a refer
 ## TODOS
 - Switch font rendering to [fontdue](https://docs.rs/fontdue-sdl2/0.3.2/fontdue_sdl2/)
 - Possibly Migrate to [gfx](https://github.com/gfx-rs/gfx) rendering
+- add more image utilities
 
 ### Features
+- Supports mp3, wav, vorbis, flac, and aac audio.
 - Supports .png, .jpg, .tiff, and .webp images
 - Supports .ttf fonts
 

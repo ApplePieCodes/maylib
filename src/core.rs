@@ -9,6 +9,7 @@ use sdl2::video::FullscreenType;
 use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, video, EventPump, Sdl, TimerSubsystem, VideoSubsystem};
 use std::{collections::HashMap, str};
 
+/// Defines a color
 #[derive(Clone, Copy)]
 pub struct Color {
     r: u8,
@@ -18,10 +19,12 @@ pub struct Color {
 }
 #[allow(non_upper_case_globals)]
 impl Color {
+    /// Creates a new solid color
     pub fn new(r: u8, g: u8, b: u8) -> Color {
         Color { r, g, b, a: 255 }
     }
 
+    /// Creates a new color with transparency
     pub fn new_alpha(r: u8, g: u8, b: u8, a: u8) -> Color {
         Color { r, g, b, a }
     }
@@ -33,6 +36,7 @@ impl Color {
         a: 0xFF,
     };
 
+    /// Raylib logo white
     pub const RayWhite: Color = Color {
         r: 0xF5,
         g: 0xF5,
@@ -54,6 +58,7 @@ impl Color {
         a: 0xFF,
     };
 
+    /// Maylib logo gray
     pub const MayGray: Color = Color {
         r: 0x28,
         g: 0x28,
@@ -153,6 +158,7 @@ impl Color {
     };
 }
 impl From<Color> for pixels::Color {
+    /// Yield a sdl2::pixels::Color from a maylib::core::Color
     fn from(value: Color) -> Self {
         pixels::Color {
             r: value.r,
@@ -163,39 +169,68 @@ impl From<Color> for pixels::Color {
     }
 }
 
+// A window
 pub(crate) struct Window {
+    /// The actual window
     pub(crate) window: video::Window,
+    /// The canvas to draw on
     pub(crate) canvas: Canvas<video::Window>,
+    /// The texture creator
     pub(crate) texture: TextureCreator<video::WindowContext>,
+    /// Window readiness
     ready: bool,
+    /// Should window close
     should_close: bool,
+    /// Is window fullscreen
     fullscreen: bool,
+    /// Is window hidden
     hidden: bool,
+    /// Is window minimized
     minimized: bool,
+    /// Is window maximized
     maximized: bool,
+    /// Is window focused
     focused: bool,
-    resized: bool,
+    /// Is window bordered
     bordered: bool,
+    /// Has window been resized
+    resized: bool,
+    /// Previous frame time
     previous_time: f64,
+    /// Current time
     current_time: f64,
+    /// Time window was opened
     start_time: f64,
 }
 
+/// The maylib state and logic
 pub struct Maylib {
+    /// SDL's video subsystem
     video: VideoSubsystem,
+    /// The event pump
     event_pump: EventPump,
+    /// The mouse
     mouse: MouseUtil,
+    /// The timer/clock
     timer: TimerSubsystem,
+    /// Clipboard access
     clipboard: ClipboardUtil,
+    /// The currently open window
     pub(crate) current_window: u32,
+    /// all windows
     pub(crate) windows: HashMap<u32, Window>,
+    /// The frame rate to run at
     frame_rate: i32,
+    /// The delay between each frame
     frame_time: f32,
+    /// The audio stream. Unused, but needs to stay loaded
     _audio_stream: OutputStream,
+    /// The audio stream handle
     pub(crate) audio: OutputStreamHandle
 }
 impl Maylib {
-    pub fn new() -> Result<Maylib, String> {
+    /// Initialize maylib
+    pub fn init() -> Result<Maylib, String> {
         let sdl: Sdl = match sdl2::init() {
             Ok(s) => s,
             Err(e) => {
@@ -247,6 +282,7 @@ impl Maylib {
         })
     }
 
+    /// Initialize a window
     pub fn init_window(&mut self, title: &str, width: u32, height: u32) -> Result<u32, String> {
         let winctx: video::Window = match self
             .video
@@ -286,11 +322,13 @@ impl Maylib {
         Ok(id)
     }
 
+    /// Close the current window
     pub fn close_window(&mut self) {
         let window = self.windows.remove(&self.current_window);
         drop(window);
     }
 
+    /// Should the current window close
     pub fn window_should_close(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -298,11 +336,13 @@ impl Maylib {
             .should_close
     }
 
+    /// Set the framerate of all windows
     pub fn set_frame_rate(&mut self, rate: i32) {
         self.frame_rate = rate;
         self.frame_time = 1.0 / rate as f32;
     }
 
+    /// Checks if all windows are closed
     pub fn all_windows_closed(&self) -> bool {
         for win in self.windows.iter() {
             if win.1.ready {
@@ -312,6 +352,7 @@ impl Maylib {
         true
     }
 
+    /// checks if current window is ready
     pub fn is_window_ready(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -319,6 +360,7 @@ impl Maylib {
             .ready
     }
 
+    /// checks if current window
     pub fn is_window_fullscreen(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -326,6 +368,7 @@ impl Maylib {
             .fullscreen
     }
 
+    /// checks if current window is hidden
     pub fn is_window_hidden(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -333,6 +376,7 @@ impl Maylib {
             .hidden
     }
 
+    /// checks if current window is minimized
     pub fn is_window_minimized(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -340,6 +384,7 @@ impl Maylib {
             .minimized
     }
 
+    /// checks if current window is maximized
     pub fn is_window_maximized(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -347,6 +392,7 @@ impl Maylib {
             .maximized
     }
 
+    /// checks if current window is focused
     pub fn is_window_focused(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -354,6 +400,7 @@ impl Maylib {
             .focused
     }
 
+    /// checks if current window is resized
     pub fn is_window_resized(&self) -> bool {
         self.windows
             .get(&self.current_window)
@@ -361,6 +408,7 @@ impl Maylib {
             .resized
     }
 
+    /// toggle fullscreen for current window
     pub fn toggle_fullscreen(&mut self) {
         match self.windows.get_mut(&self.current_window) {
             Some(w) => {
@@ -387,6 +435,7 @@ impl Maylib {
         }
     }
 
+    /// toggle borderless for current window
     pub fn toggle_borderless_windowed(&mut self) {
         match self.windows.get_mut(&self.current_window) {
             Some(w) => {
@@ -416,6 +465,7 @@ impl Maylib {
         }
     }
 
+    /// get time since current window opened
     pub fn time_since_open(&self) -> f64 {
         let start_time = self
             .windows
@@ -429,6 +479,7 @@ impl Maylib {
             - start_time
     }
 
+    /// maximize current window
     pub fn maximize_window(&mut self) {
         self.windows
             .get_mut(&self.current_window)
@@ -441,6 +492,7 @@ impl Maylib {
             .maximize();
     }
 
+    /// minimize current window
     pub fn minimize_window(&mut self) {
         self.windows
             .get_mut(&self.current_window)
@@ -453,6 +505,7 @@ impl Maylib {
             .minimize();
     }
 
+    /// restore current window
     pub fn restore_window(&mut self) {
         self.windows
             .get_mut(&self.current_window)
@@ -461,6 +514,7 @@ impl Maylib {
             .restore();
     }
 
+    /// set the title of the current window
     pub fn set_window_title(&mut self, title: &str) {
         self.windows
             .get_mut(&self.current_window)
@@ -470,6 +524,7 @@ impl Maylib {
             .expect("Title should be valid. Does it contain invalid text?")
     }
 
+    /// set the position of the current window
     pub fn set_window_position(&mut self, x: i32, y: i32) {
         self.windows
             .get_mut(&self.current_window)
@@ -481,6 +536,7 @@ impl Maylib {
             );
     }
 
+    /// get the size of the current window
     pub fn get_window_size(&mut self) -> (u32, u32) {
         self.windows
             .get_mut(&self.current_window)
@@ -489,6 +545,7 @@ impl Maylib {
             .size()
     }
 
+    /// set the size of the current window
     pub fn set_window_size(&mut self, width: u32, height: u32) {
         self.windows
             .get_mut(&self.current_window)
@@ -498,6 +555,7 @@ impl Maylib {
             .expect("Size should be valid. Are any parameters 0?")
     }
 
+    /// get the screen width
     pub fn get_screen_width(&self) -> i32 {
         self.windows
             .get(&self.current_window)
@@ -508,6 +566,7 @@ impl Maylib {
             .w
     }
 
+    /// get the screen height
     pub fn get_screen_height(&self) -> i32 {
         self.windows
             .get(&self.current_window)
@@ -518,6 +577,7 @@ impl Maylib {
             .h
     }
 
+    /// get the current window x
     pub fn get_window_x(&self) -> i32 {
         self.windows
             .get(&self.current_window)
@@ -527,6 +587,7 @@ impl Maylib {
             .0
     }
 
+    /// get the current window y
     pub fn get_window_y(&self) -> i32 {
         self.windows
             .get(&self.current_window)
@@ -536,6 +597,7 @@ impl Maylib {
             .1
     }
 
+    /// get the clipboard text
     pub fn get_clipboard_text(&self) -> Option<String> {
         match self.clipboard.clipboard_text() {
             Ok(text) => Some(text),
@@ -543,23 +605,29 @@ impl Maylib {
         }
     }
 
+    /// set the clipboard text
     pub fn set_clipboard_text(&mut self, text: &str) {
         self.clipboard
             .set_clipboard_text(text)
             .expect("Clipboard should be valid");
     }
+
+    /// show the cursor
     pub fn show_cursor(&mut self) {
         self.mouse.show_cursor(true);
     }
 
+    /// hide the cursor
     pub fn hide_cursor(&mut self) {
         self.mouse.show_cursor(false);
     }
 
+    /// check if the cursor is hidden
     pub fn cursor_hidden(&mut self) -> bool {
         self.mouse.is_cursor_showing()
     }
 
+    /// clear the background of the current window
     pub fn clear_background(&mut self, color: Color) {
         self.windows
             .get_mut(&self.current_window)
@@ -573,6 +641,7 @@ impl Maylib {
             .clear();
     }
 
+    /// begin drawing
     pub fn begin_drawing(&mut self) {
         for window in self.windows.values_mut() {
             window.previous_time = window.current_time;
@@ -616,16 +685,19 @@ impl Maylib {
         self.wait(self.frame_time as f64);
     }
 
+    /// end drawing
     pub fn end_drawing(&mut self) {
         for window in self.windows.values_mut() {
             window.canvas.present();
         }
     }
 
+    /// switch window
     pub fn switch_window(&mut self, id: u32) {
         self.current_window = id;
     }
 
+    /// get the time since opening sdl
     pub fn get_time(&self) -> f64 {
         self.windows
             .get(&self.current_window)
@@ -633,6 +705,7 @@ impl Maylib {
             .current_time
     }
 
+    /// wait an amount of time
     pub fn wait(&mut self, time: f64) {
         let start: f64 = self.get_time();
         let mut current: f64 = self.get_time();
@@ -654,29 +727,48 @@ impl Maylib {
         }
     }
 
+    /// get a random i32
+    pub fn get_random_i32(min: i32, max: i32) -> i32 {
+        let mut rand = rng();
+        rand.random_range(min..max)
+    }
+
+    /// get a random i64
     pub fn get_random_i64(min: i64, max: i64) -> i64 {
         let mut rand = rng();
         rand.random_range(min..max)
     }
 
+    /// get a random f64
+    pub fn get_random_f64(min: f64, max: f64) -> f64 {
+        let mut rand = rng();
+        rand.random_range(min..max)
+    }
+
+
+    /// open a URL in the browser
     pub fn open_url(&mut self, url: &str) {
         open::that(url).expect("Should be able to open URL");
     }
 
+    /// checks if key is pressed
     pub fn key_pressed(&mut self, key: Scancode) -> bool {
         self.event_pump.keyboard_state().is_scancode_pressed(key)
     }
 
+    /// checks if mouse button is pressed
     pub fn mouse_button_pressed(&mut self, button: MouseButton) -> bool {
         self.event_pump
             .mouse_state()
             .is_mouse_button_pressed(button)
     }
 
+    /// get the mouse x
     pub fn get_mouse_x(&self) -> i32 {
         self.event_pump.mouse_state().x()
     }
 
+    /// get the mouse y
     pub fn get_mouse_y(&self) -> i32 {
         self.event_pump.mouse_state().y()
     }
