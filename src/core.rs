@@ -629,6 +629,7 @@ impl Maylib {
     pub fn wait(&mut self, time: f64) {
         let start: f64 = self.get_time();
         let mut current: f64 = self.get_time();
+        println!("Waiting. Start at {current}. End at {start} + {time}");
 
         while current < start + time {
             self.windows
@@ -642,9 +643,10 @@ impl Maylib {
             self.windows
                 .get_mut(&self.current_window)
                 .expect("Window should be valid if loaded from switch_window")
-                .previous_time = self.timer.ticks64() as f64 / 1000f64;
+                .current_time = self.timer.ticks64() as f64 / 1000f64;
             current = self.get_time();
         }
+        println!("Waiting. End at {}. Current time {}", current, current);
     }
 
     pub fn get_random_i64(min: i64, max: i64) -> i64 {
