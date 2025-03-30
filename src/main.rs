@@ -1,32 +1,48 @@
-use core::{Color, Maylib};
 use crate::text::FontManager;
+use core::{Color, Maylib};
+use sdl2::keyboard::Scancode;
 
 pub mod core;
 pub mod image;
-mod text;
 mod shapes;
+mod text;
 
 fn main() {
-    let mut may = Maylib::new();
+    let mut may = Maylib::new().expect("Code in main should be correct");
     let mut fontmgr = FontManager::new();
-    let font = fontmgr.load_font("C:\\Users\\Liam Greenway\\RustroverProjects\\maylib\\font.ttf", 20);
+    let font = fontmgr.load_font(
+        "C:\\Users\\Liam Greenway\\RustroverProjects\\maylib\\font.ttf",
+        20,
+    );
     {
-        let window = may.init_window("Froggy", 1280, 720);
+        let window = may
+            .init_window("Froggy", 1280, 720)
+            .expect("Code in main should be correct");
 
         may.switch_window(window);
+
+        let mut x = 0;
+        let mut y = 0;
 
         while !may.window_should_close() {
             may.begin_drawing();
 
             may.clear_background(Color::MayGray);
 
-            may.draw_image("C:\\Users\\Liam Greenway\\RustroverProjects\\maylib\\Frog.png", 50, 50);
-            let tsize = may.measure_text(&font, "Hello Freg");
-            let size = may.get_window_size();
-            let x = size.0 / 2 - tsize.0 / 2;
-            let y = size.1 / 2 - tsize.1 / 2;
-            may.draw_text(&font, "Hello Freg", x as i32, y as i32, Color::Red);
-            may.draw_rectangle(0, 0, 500, 500, Color::RayWhite);
+            if may.key_pressed(Scancode::W) {
+                y -= 1;
+            }
+            if may.key_pressed(Scancode::S) {
+                y += 1;
+            }
+            if may.key_pressed(Scancode::A) {
+                x -= 1;
+            }
+            if may.key_pressed(Scancode::D) {
+                x += 1;
+            }
+
+            may.draw_rectangle(x, y, 50, 50, Color::RayWhite);
 
             may.end_drawing()
         }
