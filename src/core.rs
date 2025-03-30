@@ -4,11 +4,11 @@ use sdl2::image::{InitFlag, Sdl2ImageContext};
 use sdl2::keyboard::{KeyboardUtil, Scancode};
 use sdl2::mouse::{MouseButton, MouseUtil};
 use sdl2::render::TextureCreator;
-use sdl2::ttf::{Font, Sdl2TtfContext};
 use sdl2::video::FullscreenType;
 use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, ttf, video, EventPump, TimerSubsystem, VideoSubsystem};
 use std::rc::Rc;
 use std::{collections::HashMap, str};
+use crate::text;
 
 pub struct Color {
     r: u8,
@@ -191,35 +191,31 @@ pub(crate) struct Window {
     start_time: f64,
 }
 
-pub struct Maylib<'a> {
+pub struct Maylib {
     video: VideoSubsystem,
     event_pump: EventPump,
     mouse: MouseUtil,
     timer: TimerSubsystem,
     pub(crate) image: Sdl2ImageContext,
-    pub(crate) ttf: Sdl2TtfContext,
     keyboard: KeyboardUtil,
     clipboard: ClipboardUtil,
     pub(crate) current_window: u32,
     pub(crate) windows: HashMap<u32, Window>,
-    pub(crate) fonts: HashMap<String, Box<Font<'a, 'a>>>,
 }
-impl<'a> Maylib<'a> {
-    pub fn new() -> Maylib<'a> {
+impl Maylib {
+    pub fn new() -> Maylib {
         let sdl = sdl2::init().unwrap();
         let video = sdl.video().unwrap();
         return Maylib {
             event_pump: sdl.event_pump().unwrap(),
             clipboard: video.clipboard(),
             mouse: sdl.mouse(),
-            ttf: ttf::init().unwrap(),
             timer: sdl.timer().unwrap(),
             keyboard: sdl.keyboard(),
             video,
             image: sdl2::image::init(InitFlag::PNG | InitFlag::JPG | InitFlag::TIF | InitFlag::WEBP).unwrap(),
             current_window: 4294967295, // There should never be a window with this value
             windows: HashMap::new(),
-            fonts: HashMap::new(),
         };
     }
 
