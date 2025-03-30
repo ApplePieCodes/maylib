@@ -5,7 +5,7 @@ use sdl2::keyboard::{KeyboardUtil, Scancode};
 use sdl2::mouse::{MouseButton, MouseUtil};
 use sdl2::render::TextureCreator;
 use sdl2::video::FullscreenType;
-use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, ttf, video, EventPump, TimerSubsystem, VideoSubsystem};
+use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, ttf, video, EventPump, Sdl, TimerSubsystem, VideoSubsystem};
 use std::rc::Rc;
 use std::{collections::HashMap, str};
 use crate::text;
@@ -204,8 +204,16 @@ pub struct Maylib {
     pub(crate) windows: HashMap<u32, Window>,
 }
 impl Maylib {
-    pub fn new() -> Maylib {
-        let sdl = sdl2::init().unwrap();
+    pub fn new() -> Result<Maylib, String> {
+        let sdl: Sdl;
+        match sdl2::init() {
+            Ok(s) => {
+                sdl = s;
+            }
+            Err(e) => {
+                
+            }
+        }
         let video = sdl.video().unwrap();
         return Maylib {
             event_pump: sdl.event_pump().unwrap(),
