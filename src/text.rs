@@ -13,7 +13,7 @@ impl FontManager {
         }
     }
 
-    pub fn load_font(&mut self, font_path: &str, font_name: &str, font_size: u16) -> Font {
+    pub fn load_font(&mut self, font_path: &str, font_size: u16) -> Font {
         let font = self.ttf.load_font(font_path, font_size).unwrap();
         Font {
             font
@@ -22,7 +22,7 @@ impl FontManager {
 }
 
 pub struct Font<'a> {
-    pub(crate) font: sdl2::ttf::Font<'a, 'a>,
+    pub(crate) font: sdl2::ttf::Font<'a, 'static>,
 }
 
 impl Maylib {
@@ -32,5 +32,9 @@ impl Maylib {
         let texture = binding.texture.create_texture_from_surface(&surface).unwrap();
         let target = Rect::new(x, y, surface.width(), surface.height());
         binding.canvas.copy(&texture, None, Some(target)).unwrap();
+    }
+
+    pub fn measure_text(&self, font: &Font, text: &str) -> (u32, u32) {
+        font.font.render(text).blended(Color::MayGray).unwrap().size()
     }
 }

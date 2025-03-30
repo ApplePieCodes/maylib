@@ -8,7 +8,7 @@ mod text;
 fn main() {
     let mut may = Maylib::new();
     let mut fontmgr = FontManager::new();
-    let font = fontmgr.load_font("C:\\Users\\Liam Greenway\\maylib\\font.ttf", "may", 20);
+    let font = fontmgr.load_font("C:\\Users\\Liam Greenway\\RustroverProjects\\maylib\\font.ttf", 20);
     {
         let window = may.init_window("Froggy", 1280, 720);
 
@@ -19,8 +19,12 @@ fn main() {
 
             may.clear_background(Color::MayGray);
 
-            may.draw_image("C:\\Users\\Liam Greenway\\maylib\\Frog-tree.jpg", 50, 50);
-            may.draw_text(&font, "Hello Freg", 100, 100, Color::White);
+            may.draw_image("C:\\Users\\Liam Greenway\\RustroverProjects\\maylib\\Frog-tree.jpg", 50, 50);
+            let tsize = may.measure_text(&font, "Hello Freg");
+            let size = may.get_window_size();
+            let x = size.0 / 2 - tsize.0 / 2;
+            let y = size.1 / 2 - tsize.1 / 2;
+            may.draw_text(&font, "Hello Freg", x as i32, y as i32, Color::Red);
 
             may.end_drawing()
         }

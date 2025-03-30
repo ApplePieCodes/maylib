@@ -393,6 +393,10 @@ impl Maylib {
         self.windows.get_mut(&self.current_window).unwrap().window.set_position(video::WindowPos::Positioned(x), video::WindowPos::Positioned(y));
     }
 
+    pub fn get_window_size(&mut self) -> (u32, u32) {
+        self.windows.get_mut(&self.current_window).unwrap().window.size()
+    }
+
     pub fn set_window_size(&mut self, width: u32, height: u32) {
         self.windows.get_mut(&self.current_window).unwrap().window.set_size(width, height).unwrap();
     }
