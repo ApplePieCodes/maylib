@@ -13,7 +13,6 @@ I made multi-window raylib because I needed multiple windows in raylib.
 While Maylib is based on raylib, it is not a fork. I just used raylib as a reference
 
 ## TODOS
-- Switch font rendering to [fontdue](https://docs.rs/fontdue-sdl2/0.3.2/fontdue_sdl2/)
 - Possibly Migrate to [gfx](https://github.com/gfx-rs/gfx) rendering
 - add more image utilities
 
@@ -33,3 +32,4 @@ While Maylib is based on raylib, it is not a fork. I just used raylib as a refer
 - sdl2-image
 
 note that libraries like sdl2, sdl2-ttf, etc. *need* to be installed for the triplet you are building for
+also note that cargo test must be run with the --test-threads 1 argument. This is because sdl will crash if you have multiple instances in one process
