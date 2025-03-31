@@ -3,11 +3,27 @@ use rodio::{OutputStream, OutputStreamHandle};
 use sdl2::clipboard::ClipboardUtil;
 use sdl2::image::InitFlag;
 use sdl2::keyboard::Scancode;
-use sdl2::mouse::{MouseButton, MouseUtil};
+use sdl2::mouse::MouseUtil;
 use sdl2::render::TextureCreator;
 use sdl2::video::FullscreenType;
 use sdl2::{event::{Event, WindowEvent}, pixels, render::Canvas, video, EventPump, Sdl, TimerSubsystem, VideoSubsystem};
 use std::{collections::HashMap, str};
+
+pub enum MouseButton {
+    Left,
+    Right,
+    Middle,
+}
+impl From<MouseButton> for sdl2::mouse::MouseButton {
+    fn from(button: MouseButton) -> Self {
+        match button {
+            MouseButton::Left => sdl2::mouse::MouseButton::Left,
+            MouseButton::Right => sdl2::mouse::MouseButton::Right,
+            MouseButton::Middle => sdl2::mouse::MouseButton::Middle,
+            _ => sdl2::mouse::MouseButton::X1,
+        }
+    }
+}
 
 /// Defines a color
 #[derive(Clone, Copy)]
@@ -760,7 +776,7 @@ impl Maylib {
     pub fn mouse_button_pressed(&mut self, button: MouseButton) -> bool {
         self.event_pump
             .mouse_state()
-            .is_mouse_button_pressed(button)
+            .is_mouse_button_pressed(sdl2::mouse::MouseButton::from(button))
     }
 
     /// get the mouse x
