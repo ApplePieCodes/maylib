@@ -13,7 +13,7 @@ pub mod test {
     pub fn text_test() {
         let mut maylib = Maylib::init().expect("Code in tests should be correct");
         let window = maylib.init_window("Text Test", 640, 480).expect("Code in tests should be correct");
-        let fira = maylib.load_font(include_bytes!(".././fira-code.ttf"));
+        let fira = maylib.load_font_bytes(include_bytes!(".././fira-code.ttf"));
         maylib.switch_window(window);
         while !maylib.window_should_close() {
             maylib.begin_drawing();
