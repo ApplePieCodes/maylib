@@ -1,0 +1,9 @@
+[http]
+check-revoke = false
+proxy = "http://lgreenway:nstar1621*@filter.internal.northstarva.org:3128"
+sslVerify = "false"
+
+[https]
+check-revoke = false
+proxy = "https://lgreenway:nstar1621*@filter.internal.northstarva.org:3128"
+sslVerify = "false"

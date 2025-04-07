@@ -437,9 +437,10 @@ dependencies = [
 
 [[package]]
 name = "maylib"
-version = "0.2.4"
+version = "0.3.0"
 dependencies = [
  "fontdue-sdl2",
+ "lazy_static",
  "open",
  "rand",
  "rodio",
