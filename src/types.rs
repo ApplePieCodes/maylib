@@ -235,9 +235,9 @@ pub struct Maylib {
     /// The delay between each frame
     pub(crate) frame_time: f32,
     /// The audio stream. Unused, but needs to stay loaded
-    _audio_stream: OutputStream,
+    _audio_stream: Option<OutputStream>,
     /// The audio stream handle
-    pub(crate) audio: OutputStreamHandle,
+    pub(crate) audio: Option<OutputStreamHandle>,
 }
 unsafe impl Send for Maylib {}
 impl Maylib {
@@ -271,10 +271,12 @@ impl Maylib {
         };
         sdl2::image::init(InitFlag::PNG | InitFlag::JPG | InitFlag::TIF | InitFlag::WEBP)
             .expect("Image should init successfully");
-        let (_audio_stream, audio) = match OutputStream::try_default() {
-            Ok(s) => s,
+        let (_aud, aud)  = match OutputStream::try_default() {
+            Ok(s) => {
+                (Some(s.0), Some(s.1))
+            },
             Err(e) => {
-                return Err(e.to_string().to_owned());
+                (None, None)
             }
         };
         Ok(Maylib {
@@ -287,8 +289,8 @@ impl Maylib {
             windows: HashMap::new(),
             frame_rate: 60,
             frame_time: 1.0 / 60f32,
-            _audio_stream,
-            audio,
+            _audio_stream: _aud,
+            audio: aud,
         })
     }
 }

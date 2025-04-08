@@ -4,13 +4,15 @@ use std::io::BufReader;
 use crate::core::MAYLIB;
 
 pub fn play_sound(path: &str) {
-    let get = MAYLIB.lock().expect("Should be able to lock");
+    let mut get = MAYLIB.lock().expect("Should be able to lock");
     // Load the audio
     let file = BufReader::new(File::open(path).expect("File not found"));
     // Decode
     let source = Decoder::new(file).expect("File not valid");
     // And play. It's that shrimple
-    get.audio
-        .play_raw(source.convert_samples())
-        .expect("TODO: panic message");
+    if let Some(a) = get.audio.as_mut() {
+        a
+            .play_raw(source.convert_samples())
+            .expect("TODO: panic message");
+    }
 }
