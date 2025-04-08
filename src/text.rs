@@ -53,22 +53,20 @@ pub fn draw_text(font: &Font, text: &str, size: f32, x: i32, y: i32, color: Colo
     }
 }
 
-pub fn measure_text_width(font: &Font, text: &str, size: f32) -> f32 {
-    let mut width = 0.0;
-    for c in text.chars() {
-        let (metrics, _) = font.font.rasterize(c, size);
-        width += metrics.advance_width;
-    }
-    
-    width
+pub fn measure_text_width(font: &Font, text: &str, size: f32, x: f32, y: f32) -> f32 {
+    let mut get = MAYLIB.lock().expect("Should be able to lock");
+    let current_window = get.current_window;
+    let mut fonts = &[font.font.clone()];
+    text.chars()
+        .map(|c| font.font.metrics(c, size).advance_width)
+        .sum()
 }
 
-pub fn measure_text_height(font: &Font, text: &str, size: f32) -> f32 {
-    if text.is_empty() {
-        0.0
-    }
-    else {
-        let (metrics, _) = font.font.rasterize(text.chars().next().expect("Should have a [0] because it's not empty"), size);
-        metrics.height as f32
-    }
+pub fn measure_text_hight(font: &Font, text: &str, size: f32, x: f32, y: f32) -> f32 {
+    let mut get = MAYLIB.lock().expect("Should be able to lock");
+    let current_window = get.current_window;
+    let mut fonts = &[font.font.clone()];
+    text.chars()
+        .map(|c| font.font.metrics(c, size).advance_height)
+        .sum()
 }
