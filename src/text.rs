@@ -54,51 +54,21 @@ pub fn draw_text(font: &Font, text: &str, size: f32, x: i32, y: i32, color: Colo
 }
 
 pub fn measure_text_width(font: &Font, text: &str, size: f32) -> f32 {
-    let mut get = MAYLIB.lock().expect("Should be able to lock");
-    let current_window = get.current_window;
-    let mut layout: Layout<Color> = Layout::new(CoordinateSystem::PositiveYDown);
-    let fonts = [font.font.clone()];
-
-    layout.reset(&fontdue::layout::LayoutSettings {
-        x: 0f32, // Apply X offset
-        y: 0f32, // Apply Y offset
-        ..Default::default()
-    });
-
-    layout.append(
-        &fonts,
-        &TextStyle::with_user_data(text, size, 0, Color::MayGray.into()),
-    );
+    let mut width = 0.0;
+    for c in text.chars() {
+        let (metrics, _) = font.font.rasterize(c, size);
+        width += metrics.advance_width;
+    }
     
-    if let Some(window) = get.windows.get_mut(&current_window) {
-        FontTexture::new(&window.texture).expect("Failed to load font").texture.query().width as f32
-    }
-    else { 
-        return 0.0;
-    }
+    width
 }
 
 pub fn measure_text_height(font: &Font, text: &str, size: f32) -> f32 {
-    let mut get = MAYLIB.lock().expect("Should be able to lock");
-    let current_window = get.current_window;
-    let mut layout: Layout<Color> = Layout::new(CoordinateSystem::PositiveYDown);
-    let fonts = [font.font.clone()];
-
-    layout.reset(&fontdue::layout::LayoutSettings {
-        x: 0f32, // Apply X offset
-        y: 0f32, // Apply Y offset
-        ..Default::default()
-    });
-
-    layout.append(
-        &fonts,
-        &TextStyle::with_user_data(text, size, 0, Color::MayGray.into()),
-    );
-
-    if let Some(window) = get.windows.get_mut(&current_window) {
-        FontTexture::new(&window.texture).expect("Failed to load font").texture.query().height as f32
+    if text.is_empty() {
+        0.0
     }
-    else { 
-        return 0.0;
+    else {
+        let (metrics, _) = font.font.rasterize(text.chars().next().expect("Should have a [0] because it's not empty"), size);
+        metrics.height as f32
     }
 }
